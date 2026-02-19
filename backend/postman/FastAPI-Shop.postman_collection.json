@@ -1,0 +1,370 @@
+{
+  "info": {
+    "_postman_id": "b5d5b2dc-3a74-4ff3-9f5d-a8d4d66d1f11",
+    "name": "FastAPI Shop API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Коллекция для проверки основных эндпоинтов FastAPI Shop API"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "pm.test('Health status is healthy', function () {",
+              "    pm.expect(body.status).to.eql('healthy');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Categories",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/categories",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "categories"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const categories = pm.response.json();",
+              "pm.test('Response is array and has at least one category', function () {",
+              "    pm.expect(categories).to.be.an('array');",
+              "    pm.expect(categories.length).to.be.above(0);",
+              "});",
+              "",
+              "if (categories.length > 0) {",
+              "    pm.collectionVariables.set('category_id', categories[0].id);",
+              "}",
+              "",
+              "pm.test('Category has required fields', function () {",
+              "    pm.expect(categories[0]).to.have.property('id');",
+              "    pm.expect(categories[0]).to.have.property('name');",
+              "    pm.expect(categories[0]).to.have.property('slug');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Category By ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/categories/{{category_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "categories",
+            "{{category_id}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const category = pm.response.json();",
+              "pm.test('Requested category id matches variable', function () {",
+              "    pm.expect(category.id).to.eql(Number(pm.collectionVariables.get('category_id')));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Products",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/products",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "products"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "pm.test('Products response has products array and total', function () {",
+              "    pm.expect(body).to.have.property('products');",
+              "    pm.expect(body.products).to.be.an('array');",
+              "    pm.expect(body).to.have.property('total');",
+              "});",
+              "",
+              "if (body.products.length > 0) {",
+              "    pm.collectionVariables.set('product_id', body.products[0].id);",
+              "}",
+              "",
+              "pm.test('Total matches products array length', function () {",
+              "    pm.expect(body.total).to.eql(body.products.length);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Product By ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/products/{{product_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "products",
+            "{{product_id}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const product = pm.response.json();",
+              "pm.test('Requested product id matches variable', function () {",
+              "    pm.expect(product.id).to.eql(Number(pm.collectionVariables.get('product_id')));",
+              "});",
+              "",
+              "pm.test('Product has category object', function () {",
+              "    pm.expect(product).to.have.property('category');",
+              "    pm.expect(product.category).to.have.property('id');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Products By Category",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/products/category/{{category_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "products",
+            "category",
+            "{{category_id}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "pm.test('Products filtered response has valid shape', function () {",
+              "    pm.expect(body).to.have.property('products');",
+              "    pm.expect(body).to.have.property('total');",
+              "});",
+              "",
+              "pm.test('All products belong to requested category', function () {",
+              "    const expectedCategoryId = Number(pm.collectionVariables.get('category_id'));",
+              "    body.products.forEach((p) => pm.expect(p.category_id).to.eql(expectedCategoryId));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart / Add Item",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"product_id\": {{product_id}},\n  \"quantity\": 2,\n  \"cart\": {}\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/cart/add",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "cart",
+            "add"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "pm.test('Cart response has cart object', function () {",
+              "    pm.expect(body).to.have.property('cart');",
+              "    pm.expect(body.cart).to.be.an('object');",
+              "});",
+              "",
+              "pm.collectionVariables.set('cart_json', JSON.stringify(body.cart));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart / Update Item",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"product_id\": {{product_id}},\n  \"quantity\": 3,\n  \"cart\": {{cart_json}}\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/cart/update",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "cart",
+            "update"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "pm.test('Updated cart still has item', function () {",
+              "    const productId = String(pm.collectionVariables.get('product_id'));",
+              "    pm.expect(body).to.have.property('cart');",
+              "    pm.expect(body.cart[productId]).to.eql(3);",
+              "});",
+              "",
+              "pm.collectionVariables.set('cart_json', JSON.stringify(body.cart));"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "category_id",
+      "value": "1"
+    },
+    {
+      "key": "product_id",
+      "value": "1"
+    },
+    {
+      "key": "cart_json",
+      "value": "{}"
+    }
+  ]
+}
